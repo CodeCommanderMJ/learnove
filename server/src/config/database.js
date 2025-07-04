@@ -5,6 +5,7 @@ const connectDB = async () => {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // 5 second timeout
     });
 
     console.log(`📦 MongoDB Connected: ${conn.connection.host}`);
@@ -27,7 +28,8 @@ const connectDB = async () => {
 
   } catch (error) {
     console.error('Database connection failed:', error.message);
-    process.exit(1);
+    console.log('⚠️  Running without database - some features will be limited');
+    // Don't exit, continue without database for demo purposes
   }
 };
 
