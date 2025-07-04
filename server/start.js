@@ -3,7 +3,7 @@
 console.log('🚀 Starting Learnova Backend...\n');
 
 // Check if MongoDB is needed
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 async function startServer() {
   try {
@@ -24,7 +24,7 @@ async function startServer() {
 
     // Start the main server
     console.log('🔥 Starting Express server...');
-    require('./src/server.js');
+    await import('./src/server.js');
     
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);
