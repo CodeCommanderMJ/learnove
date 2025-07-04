@@ -9,7 +9,7 @@ export const connectRedis = async () => {
     });
 
     redisClient.on('error', (err) => {
-      console.error('Redis Client Error:', err);
+      console.log('Redis Client Error (skipping for demo):', err.message);
     });
 
     redisClient.on('connect', () => {
@@ -18,7 +18,8 @@ export const connectRedis = async () => {
 
     await redisClient.connect();
   } catch (error) {
-    console.error('Redis connection failed:', error.message);
+    console.log('⚠️  Redis connection failed (continuing without Redis):', error.message);
+    redisClient = null;
   }
 };
 

@@ -28,24 +28,41 @@ import chatRoutes from './routes/chatRoutes.js';
 // Load environment variables
 dotenv.config();
 
-// Connect to databases
-connectDB();
-connectRedis();
+// Connect to databases (with error handling)
+try {
+  connectDB();
+} catch (error) {
+  console.log('⚠️  Database connection skipped for demo');
+}
+
+try {
+  connectRedis();
+} catch (error) {
+  console.log('⚠️  Redis connection skipped for demo');
+}
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
-});
 
-// Setup Socket.IO
-setupSocketIO(io);
+// Setup Socket.IO with error handling
+let io;
+try {
+  io = new Server(server, {
+    cors: {
+      origin: process.env.FRONTEND_URL || "http://localhost:3000",
+      methods: ["GET", "POST"]
+    }
+  });
+  setupSocketIO(io);
+} catch (error) {
+  console.log('⚠️  Socket.IO setup skipped');
+}
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: false
+}));
 app.use(mongoSanitize());
 app.use(compression());
 
@@ -64,8 +81,12 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Rate limiting
-app.use('/api/', rateLimiter);
+// Rate limiting (with error handling)
+try {
+  app.use('/api/', rateLimiter);
+} catch (error) {
+  console.log('⚠️  Rate limiting disabled for demo');
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -73,7 +94,8 @@ app.get('/health', (req, res) => {
     status: 'success',
     message: 'Learnova API is running',
     timestamp: new Date().toISOString(),
-    version: process.env.API_VERSION || 'v1'
+    version: process.env.API_VERSION || 'v1',
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
@@ -99,6 +121,8 @@ server.listen(PORT, () => {
   console.log(`🚀 Learnova API server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV}`);
   console.log(`🔗 API Version: ${apiVersion}`);
+  console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+  console.log(`📚 API docs: http://localhost:${PORT}/api/${apiVersion}`);
 });
 
 // Graceful shutdown
