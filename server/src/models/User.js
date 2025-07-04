@@ -148,8 +148,7 @@ userSchema.methods.updateLastLogin = function() {
   return this.save({ validateBeforeSave: false });
 };
 
-// Indexes for performance
-userSchema.index({ email: 1 });
+// Indexes for performance (removed duplicate email index)
 userSchema.index({ role: 1 });
 userSchema.index({ 'subscription.plan': 1 });
 userSchema.index({ isActive: 1 });
