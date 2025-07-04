@@ -3,9 +3,16 @@ import { createClient } from 'redis';
 let redisClient;
 
 export const connectRedis = async () => {
+  // Only attempt Redis connection if REDIS_URL is explicitly provided
+  if (!process.env.REDIS_URL) {
+    console.log('⚠️  No REDIS_URL provided, skipping Redis connection');
+    redisClient = null;
+    return;
+  }
+
   try {
     redisClient = createClient({
-      url: process.env.REDIS_URL || 'redis://localhost:6379'
+      url: process.env.REDIS_URL
     });
 
     redisClient.on('error', (err) => {

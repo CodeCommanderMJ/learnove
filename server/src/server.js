@@ -88,6 +88,20 @@ try {
   console.log('⚠️  Rate limiting disabled for demo');
 }
 
+// Root route handler
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Welcome to Learnova API',
+    version: process.env.API_VERSION || 'v1',
+    environment: process.env.NODE_ENV || 'development',
+    endpoints: {
+      health: '/health',
+      api: `/api/${process.env.API_VERSION || 'v1'}`
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
